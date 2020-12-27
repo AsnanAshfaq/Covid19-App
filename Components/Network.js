@@ -1,6 +1,6 @@
-import * as Network from 'expo-network';
+import * as Network from "expo-network";
 
 export const networkDetails = async () => {
-    const details = await Network.getNetworkStateAsync()
-    console.log(details)
-}
+  const details = await Network.getNetworkStateAsync();
+  console.log(details);
+};
