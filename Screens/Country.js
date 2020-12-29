@@ -1,93 +1,160 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Image, ScrollView ,Animated} from 'react-native'
-import ChartDetails from '../Components/chartDetails'
-import Chart from '../Components/barChart'
-import Loadingcomponent from '../Components/Loading'
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Animated,
+  ToastAndroid,
+} from "react-native";
+import ChartDetails from "../Components/chartDetails";
+import Chart from "../Components/barChart";
+import Loadingcomponent from "../Components/Loading";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export default Country = ({ navigation, route }) => {
+  const [Loading, setLoading] = useState(true);
+  const [data, setdata] = useState([]);
+  const [Flag, setFlag] = useState("");
+  const [isFavorite, setisFavorite] = useState(false);
+  const animatedOpacity = useState(new Animated.Value(0))[0];
 
+  const fetchData = async () => {
+    setdata(route.params.countryDetails);
+    const image = {
+      uri: route.params.countryDetails.countryInfo.flag,
+    };
+    setFlag(image);
+  };
 
-export default Country = ({ navigation }) => {
+  function animateView() {
+    Animated.timing(animatedOpacity, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }
 
-    const [Loading, setLoading] = useState(true)
-    const [data, setdata] = useState([])
-    const [Flag, setFlag] = useState('')
-    const animatedOpacity = useState(new Animated.Value(0))[0]
+  useEffect(() => {
+    async function getData() {
+      if (data == null || data.length == 0) {
+        await fetchData();
 
-
-    const fetchData = () => {
-        setdata(navigation.state.params.countryDetails)
-        const image = { uri: navigation.state.params.countryDetails.countryInfo.flag }
-        setFlag(image)
+        animateView();
+      } else setLoading(false);
     }
+    getData();
+  });
 
-    function animateView() {
-        Animated.timing(animatedOpacity, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver:true
-        }).start()
-    }
+  useEffect(() => {
+    const asyncStorage = async () => {
+      if (data != []) {
+        try {
+          const value = await AsyncStorage.getAllKeys();
+          // search for the key with the name of the country
+          console.log(value);
 
+          const isKeyAvailable = value.indexOf(data.country);
 
-    useEffect(() => {
-        if (data == null || data.length == 0) {
-            fetchData()
-            setLoading(false)
-            animateView()
+          if (isKeyAvailable != -1) setisFavorite(true);
+          else setisFavorite(false);
+        } catch (error) {
+          console.log(error);
         }
-        else setLoading(false)
+      }
+    };
+    asyncStorage();
+    setLoading(false);
+  }, [data]);
 
-    })
+  const handleFavorites = async () => {
+    // add or remove the country from the async storage
 
+    try {
+      const value = await AsyncStorage.getAllKeys();
+      // search for the key with the name of the country
 
-    if (Loading || Flag == '') return <View style={styles.container}><Loadingcomponent /></View>
-
-    else {
-        return (
-            <View style={styles.container}>
-                <ScrollView>
-                    <Animated.View style={[styles.header,{opacity: animatedOpacity}]}>
-                        <Image
-                            source={{ uri: Flag.uri }}
-                            style={styles.FlagStyle}
-                            fadeDuration={100}
-                        />
-                        <Text style={styles.countryName}>{data.country.toUpperCase()}</Text>
-                    </Animated.View>
-
-                    {/* Rendering Bar Chart Component */}
-                    <Chart worldData={data} />
-                    {/* Rendering Chart Details Component */}
-
-                    <ChartDetails data={data} />
-                </ScrollView>
-            </View>
-        )
+      const isKeyAvailable = value.indexOf(data.country);
+      if (isKeyAvailable == -1) {
+        ToastAndroid.show(`Adding ${data.country} to Favorites`, 2000);
+        // if no country found then add the country in the storage
+        const jsonData = JSON.stringify(data);
+        await AsyncStorage.setItem(data.country, jsonData);
+        setisFavorite(true);
+      } else {
+        ToastAndroid.show(`Removing ${data.country} from Favorites`, 2000);
+        await AsyncStorage.removeItem(data.country);
+        setisFavorite(false);
+      }
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
     }
+  };
 
-}
+  // check if the contry is favorites or not
+
+  if (Loading || Flag == "")
+    return (
+      <View style={styles.container}>
+        <Loadingcomponent />
+      </View>
+    );
+  else {
+    return (
+      <View style={styles.container}>
+        <ScrollView>
+          <Animated.View style={[styles.header, { opacity: animatedOpacity }]}>
+            <Image
+              source={{ uri: Flag.uri }}
+              style={styles.FlagStyle}
+              fadeDuration={100}
+            />
+            <Text style={styles.countryName}>{data.country.toUpperCase()}</Text>
+            <TouchableWithoutFeedback onPress={() => handleFavorites()}>
+              <FontAwesome
+                name={"star"}
+                size={28}
+                color={`${isFavorite === false ? "#ffffff" : "#FFFB00"}`}
+              />
+            </TouchableWithoutFeedback>
+          </Animated.View>
+
+          {/*  Bar Chart Component */}
+          <Chart worldData={data} />
+          {/*  Chart Details Component */}
+
+          <ChartDetails data={data} />
+        </ScrollView>
+      </View>
+    );
+  }
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#121517',
-    },
-    header: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 30
-    },
-    countryName: {
-        fontFamily: 'Raleway',
-        fontSize: 22,
-        color: '#CFCFCF',
-        margin:10
-    },
-    FlagStyle: {
-        width: 150,
-        height: 100,
-        borderRadius: 20,
-        margin:20
-    }
-})
+  container: {
+    flex: 1,
+    backgroundColor: "#121517",
+  },
+  header: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  countryName: {
+    fontFamily: "Raleway",
+    fontSize: 22,
+    color: "#CFCFCF",
+    margin: 10,
+  },
+  FlagStyle: {
+    width: 150,
+    height: 100,
+    borderRadius: 20,
+    margin: 20,
+  },
+});
