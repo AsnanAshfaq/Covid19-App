@@ -20,11 +20,10 @@ export default function Favorites({ navigation }) {
   useEffect(() => {
     //   get the data from Storage
     AsyncStorage.getAllKeys().then((result) => {
-      console.log(result);
       setFavorites(result);
       setLoading(false);
     });
-  }, []);
+  },[Favorites]);
 
   const go_to_route = async (item) => {
     await AsyncStorage.getItem(item).then((result) => {
