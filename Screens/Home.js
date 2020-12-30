@@ -30,16 +30,16 @@ export default function Home({ navigation }) {
     const respsonse = await fetch("https://disease.sh/v2/all");
     const Data = await respsonse.json();
     setworldData(Data);
+    setLoading(false);
   };
 
   useEffect(() => {
     if (worldData == null || worldData.length == 0) {
-      setLoading(true);
       fetchAPI();
     } else {
       if (Loading) setLoading(false);
     }
-  });
+  }, []);
 
   if (Loading)
     return (

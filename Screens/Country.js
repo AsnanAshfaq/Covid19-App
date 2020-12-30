@@ -20,7 +20,6 @@ export default Country = ({ navigation, route }) => {
   const [data, setdata] = useState([]);
   const [Flag, setFlag] = useState("");
   const [isFavorite, setisFavorite] = useState(false);
-  const animatedOpacity = useState(new Animated.Value(0))[0];
 
   const fetchData = async () => {
     setdata(route.params.countryDetails);
@@ -30,24 +29,15 @@ export default Country = ({ navigation, route }) => {
     setFlag(image);
   };
 
-  function animateView() {
-    Animated.timing(animatedOpacity, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  }
-
   useEffect(() => {
     async function getData() {
       if (data == null || data.length == 0) {
         await fetchData();
-
-        animateView();
+        setLoading(false);
       } else setLoading(false);
     }
     getData();
-  });
+  },[]);
 
   useEffect(() => {
     const asyncStorage = async () => {
@@ -55,8 +45,6 @@ export default Country = ({ navigation, route }) => {
         try {
           const value = await AsyncStorage.getAllKeys();
           // search for the key with the name of the country
-          console.log(value);
-
           const isKeyAvailable = value.indexOf(data.country);
 
           if (isKeyAvailable != -1) setisFavorite(true);
@@ -107,7 +95,7 @@ export default Country = ({ navigation, route }) => {
     return (
       <View style={styles.container}>
         <ScrollView>
-          <Animated.View style={[styles.header, { opacity: animatedOpacity }]}>
+          <View style={[styles.header]}>
             <Image
               source={{ uri: Flag.uri }}
               style={styles.FlagStyle}
@@ -121,7 +109,7 @@ export default Country = ({ navigation, route }) => {
                 color={`${isFavorite === false ? "#ffffff" : "#FFFB00"}`}
               />
             </TouchableWithoutFeedback>
-          </Animated.View>
+          </View>
 
           {/*  Bar Chart Component */}
           <Chart worldData={data} />

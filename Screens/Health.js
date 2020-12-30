@@ -13,21 +13,13 @@ import LoadingComponent from "../Components/Loading";
 import socialDistance from "../Images/social-distance.png";
 import stayHomeStaySafe from "../Images/stay-home-stay-safe.png";
 import cough from "../Images/cough.png";
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 export default Health = () => {
   const [loading, setloding] = useState(true);
-  const HorizontalAnimation = useState(new Animated.ValueXY(0))[0];
 
   useEffect(() => {
     setloding(false);
-    function Animate() {
-      Animated.timing(HorizontalAnimation, {
-        toValue: 10,
-        duration: 2000,
-        useNativeDriver: false,
-      }).start();
-    }
-    Animate();
   });
 
   const Instructions = ({ heading, text, imageLink }) => {
@@ -72,17 +64,31 @@ export default Health = () => {
   } else {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text
+        <View style={[styles.header, { flexDirection: "row" }]}>
+          <View
             style={{
-              fontFamily: "Raleway",
-              fontSize: 25,
-              color: "#CFCFCF",
-              paddingLeft: 10,
+              flex: 0.9,
+              justifyContent: "center",
+              alignItems: "flex-start",
             }}
           >
-            Health Care
-          </Text>
+            <Text
+              style={{
+                fontFamily: "Raleway",
+                fontSize: 25,
+                color: "#CFCFCF",
+                paddingLeft: 10,
+              }}
+            >
+              Health
+            </Text>
+          </View>
+
+          <View style={{ flex: 0.1, paddingTop: 30, alignItems: "flex-start" }}>
+            <TouchableWithoutFeedback onPress={() => navigation.openDrawer()}>
+              <Icon name={"bars"} size={18} color={"#CFCFCF"} />
+            </TouchableWithoutFeedback>
+          </View>
         </View>
         <View style={styles.body}>
           <ScrollView>

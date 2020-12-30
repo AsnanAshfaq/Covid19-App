@@ -72,35 +72,49 @@ export default searchCountry = ({ navigation }) => {
     return (
       <View style={styles.container}>
         {/* input field with animation */}
-        <View style={{ flexDirection: "row" }}>
-          <Fumi
-            label={"World"}
-            labelStyle={{ color: "#CFCFCF" }}
-            value={Input == "" ? "" : Input}
-            inputStyle={{ fontFamily: "Raleway", color: "#CFCFCF" }}
-            style={{
-              flex: 0.9,
-              marginHorizontal: 15,
-              borderRadius: 8,
-              backgroundColor: "#1D2329",
-            }}
-            iconClass={FontAwesomeIcon}
-            iconName={"globe"}
-            iconColor={"white"}
-            iconSize={25}
-            onChangeText={(text) => {
-              setInput(text);
-              searchCountries(text);
-            }}
-            iconWidth={55}
-            inputPadding={22}
-          />
-          <View style={{ flex: 0.1, paddingTop: 20 }}>
+
+        <View style={[styles.header, { flexDirection: "row" }]}>
+          <View style={{ flex: 0.9, justifyContent:'center',alignItems:'flex-start'}}>
+            <Text
+              style={{
+                fontFamily: "Raleway",
+                fontSize: 25,
+                color: "#CFCFCF",
+                paddingLeft: 10,
+              }}
+            >
+              Search Country
+            </Text>
+          </View>
+
+          <View style={{ flex: 0.1, paddingTop: 30,alignItems:'flex-start'}}>
             <TouchableWithoutFeedback onPress={() => navigation.openDrawer()}>
               <Icon name={"bars"} size={18} color={"#CFCFCF"} />
             </TouchableWithoutFeedback>
           </View>
         </View>
+
+        <Fumi
+          label={"World"}
+          labelStyle={{ color: "#CFCFCF" }}
+          value={Input == "" ? "" : Input}
+          inputStyle={{ fontFamily: "Raleway", color: "#CFCFCF" }}
+          style={{
+            marginHorizontal: 15,
+            borderRadius: 8,
+            backgroundColor: "#1D2329",
+          }}
+          iconClass={FontAwesomeIcon}
+          iconName={"globe"}
+          iconColor={"white"}
+          iconSize={25}
+          onChangeText={(text) => {
+            setInput(text);
+            searchCountries(text);
+          }}
+          iconWidth={55}
+          inputPadding={22}
+        />
 
         {/* BackGround Image  */}
         <Image
@@ -187,6 +201,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#121517",
+  },
+  header: {
+    height: 80,
+    justifyContent: "center",
+    paddingLeft: 20,
   },
   backImageStyle: {
     width: 160,
